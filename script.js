@@ -128,6 +128,8 @@ document.addEventListener("DOMContentLoaded", () => {
     sqaures[pacmanCurrentIndex].classList.add("pac-man");
     pacDotEaten();
     powerPelletEaten();
+    checkForWin();
+    checkForGameOver();
   }
   document.addEventListener("keyup", movePacman);
 
@@ -143,8 +145,15 @@ document.addEventListener("DOMContentLoaded", () => {
     if (sqaures[pacmanCurrentIndex].classList.contains("power-pellet")) {
       score += 10;
       scoreDisplay.innerHTML = score;
+      // prettier-ignore
+      ghosts.forEach(ghost=> ghost.isScared = true)
+      setTimeout(unScareGhosts, 10000);
       sqaures[pacmanCurrentIndex].classList.remove("power-pellet");
     }
+  }
+  function unScareGhosts() {
+    // prettier-ignore
+    ghosts.forEach(ghost => ghost.isScared = false);
   }
 
   class Ghost {
@@ -183,10 +192,58 @@ document.addEventListener("DOMContentLoaded", () => {
         !sqaures[ghost.currentIndex + direction].classList.contains("ghost") &&
         !sqaures[ghost.currentIndex + direction].classList.contains("wall")
       ) {
-        sqaures[ghost.currentIndex].classList.remove(ghost.className, "ghost");
+        sqaures[ghost.currentIndex].classList.remove(
+          ghost.className,
+          "ghost",
+          "scared-ghost"
+        );
         ghost.currentIndex += direction;
         sqaures[ghost.currentIndex].classList.add(ghost.className, "ghost");
       } else direction = directions[Math.floor(Math.random() * directions.length)];
+
+      if (ghost.isScared) {
+        sqaures[ghost.currentIndex].classList.add("scared-ghost");
+      }
+
+      if (
+        ghost.isScared &&
+        sqaures[ghost.currentIndex].classList.contains("pacman")
+      ) {
+        sqaures[ghost.currentIndex].classList.remove(
+          ghost.className,
+          "ghost",
+          "scared-ghost"
+        );
+
+        ghost.currentIndex = ghost.startIndex;
+        sqaures[ghost.currentIndex].classList.add(ghost.className, "ghost");
+        score += 100;
+        scoreDisplay.innerHTML = score;
+      }
     }, ghost.speed);
+  }
+
+  function checkForGameOver() {
+    if (
+      sqaures[pacmanCurrentIndex].classList.contains("ghost") &&
+      !sqaures[pacmanCurrentIndex].classList.contains("ghost-lair")
+    ) {
+      // prettier-ignore
+      ghosts.forEach(ghost => clearInterval(ghost.timerId));
+      document.removeEventListener("keyup", movePacman);
+
+      // prettier-ignore
+      setTimeout(function() {alert("Game Over") , 500})
+    }
+  }
+
+  function checkForWin() {
+    if (score >= 274) {
+      // prettier-ignore
+      ghosts.forEach(ghost => clearInterval(ghost.timerId))
+      document.removeEventListener("keyup", movePacman);
+      // prettier-ignore
+      setTimeout(function() {alert("You have WON!")} , 500)
+    }
   }
 });
