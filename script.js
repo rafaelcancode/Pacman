@@ -128,8 +128,8 @@ document.addEventListener("DOMContentLoaded", () => {
     sqaures[pacmanCurrentIndex].classList.add("pac-man");
     pacDotEaten();
     powerPelletEaten();
-    checkForWin();
     checkForGameOver();
+    checkForWin();
   }
   document.addEventListener("keyup", movePacman);
 
@@ -214,11 +214,12 @@ document.addEventListener("DOMContentLoaded", () => {
           "ghost",
           "scared-ghost"
         );
-
         ghost.currentIndex = ghost.startIndex;
-        sqaures[ghost.currentIndex].classList.add(ghost.className, "ghost");
         score += 100;
         scoreDisplay.innerHTML = score;
+        sqaures[ghost.currentIndex].classList.add(ghost.className, "ghost");
+
+        checkForGameOver();
       }
     }, ghost.speed);
   }
@@ -226,7 +227,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function checkForGameOver() {
     if (
       sqaures[pacmanCurrentIndex].classList.contains("ghost") &&
-      !sqaures[pacmanCurrentIndex].classList.contains("ghost-lair")
+      !sqaures[pacmanCurrentIndex].classList.contains("scared-ghost")
     ) {
       // prettier-ignore
       ghosts.forEach(ghost => clearInterval(ghost.timerId));
